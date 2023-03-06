@@ -13,14 +13,14 @@ type withStack struct {
 func New(msg string) error {
 	return &withStack{
 		error: errors.New(msg),
-		stack: callers(),
+		stack: newStack(),
 	}
 }
 
 func Errorf(format string, args ...any) error {
 	return &withStack{
 		error: fmt.Errorf(format, args...),
-		stack: callers(),
+		stack: newStack(),
 	}
 }
 
@@ -29,7 +29,7 @@ func Wrap(err error, format string, args ...any) error {
 	if w, ok := err.(*withStack); ok {
 		st = w.stack
 	} else {
-		st = callers()
+		st = newStack()
 	}
 	return &withStack{
 		error: fmt.Errorf(format+": %w", append(args, err)...),
