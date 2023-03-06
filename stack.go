@@ -5,7 +5,7 @@ import (
 	"runtime"
 )
 
-const depth = 32
+const depth = 20
 
 type StackTracer interface {
 	StackTrace() []string
