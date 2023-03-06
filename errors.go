@@ -10,6 +10,10 @@ type withStack struct {
 	stack
 }
 
+func (w *withStack) Unwrap() error {
+	return w.error
+}
+
 func New(msg string) error {
 	return &withStack{
 		error: errors.New(msg),
@@ -37,6 +41,12 @@ func Wrap(err error, format string, args ...any) error {
 	}
 }
 
-func (w *withStack) Unwrap() error {
-	return w.error
+func WithStack(err error) error {
+	if _, ok := err.(*withStack); ok {
+		return err
+	}
+	return &withStack{
+		error: err,
+		stack: newStack(),
+	}
 }
