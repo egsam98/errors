@@ -28,7 +28,20 @@ func Errorf(format string, args ...any) error {
 	}
 }
 
-func Wrap(err error, format string, args ...any) error {
+func Wrap(err error, message string) error {
+	var st stack
+	if w, ok := err.(*withStack); ok {
+		st = w.stack
+	} else {
+		st = newStack()
+	}
+	return &withStack{
+		error: fmt.Errorf(message+": %w", err),
+		stack: st,
+	}
+}
+
+func Wrapf(err error, format string, args ...any) error {
 	var st stack
 	if w, ok := err.(*withStack); ok {
 		st = w.stack

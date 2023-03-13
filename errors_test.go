@@ -12,12 +12,12 @@ import (
 
 var ErrSome = errors.New("some")
 
-func TestWrap(t *testing.T) {
-	err := errors.Wrap(ErrSome, "prefix %d", 1)
+func TestWrapf(t *testing.T) {
+	err := errors.Wrapf(ErrSome, "prefix %d", 1)
 	t.Log(err)
 	assert.ErrorIs(t, err, ErrSome)
 
-	err = errors.Wrap(err, "prefix %d", 2)
+	err = errors.Wrapf(err, "prefix %d", 2)
 	t.Log(err)
 	assert.ErrorIs(t, err, ErrSome)
 }
