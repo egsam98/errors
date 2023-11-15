@@ -1,8 +1,9 @@
 package errors
 
 import (
-	"fmt"
 	"runtime"
+	"strconv"
+	"strings"
 )
 
 const depth = 20
@@ -19,13 +20,20 @@ func newStack() stack {
 	return pcs[:n]
 }
 
-func (s stack) StackTrace() []string {
-	var trace []string
+func (s stack) StackTrace() (trace []string) {
 	frames := runtime.CallersFrames(s)
 	for more := true; more; {
 		var f runtime.Frame
 		f, more = frames.Next()
-		trace = append(trace, fmt.Sprintf("%s: %s:%d", f.File, f.Function, f.Line))
+
+		var str strings.Builder
+		str.WriteString(f.File)
+		str.WriteString(": ")
+		str.WriteString(f.Function)
+		str.WriteByte(':')
+		str.WriteString(strconv.Itoa(f.Line))
+
+		trace = append(trace, str.String())
 	}
-	return trace
+	return
 }

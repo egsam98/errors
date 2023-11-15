@@ -6,8 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/egsam98/errors"
-	"github.com/egsam98/errors/example"
-	"github.com/egsam98/errors/log"
 )
 
 var ErrSome = errors.New("some")
@@ -30,11 +28,4 @@ func TestNew(t *testing.T) {
 func TestErrorf(t *testing.T) {
 	err := errors.Errorf("prefix: error №%d", 5)
 	t.Log(err)
-}
-
-func TestLogStackTrace(t *testing.T) {
-	l := log.NewStd(true, log.StdDebugLevel)
-
-	err := example.Struct{}.Method()
-	l.WithError(err).Errorf("Error occurred")
 }
