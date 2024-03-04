@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const depth = 20
+const maxDepth = 20
 
 type StackTracer interface {
 	StackTrace() []string
@@ -15,7 +15,7 @@ type StackTracer interface {
 type stack []uintptr
 
 func newStack() stack {
-	var pcs [depth]uintptr
+	var pcs [maxDepth]uintptr
 	n := runtime.Callers(3, pcs[:])
 	return pcs[:n]
 }
