@@ -29,3 +29,13 @@ func TestErrorf(t *testing.T) {
 	err := errors.Errorf("prefix: error №%d", 5)
 	t.Log(err)
 }
+
+func TestWrapRight(t *testing.T) {
+	err := errors.WrapRightf(ErrSome, "suffix %d", 1)
+	assert.ErrorIs(t, err, ErrSome)
+	assert.EqualError(t, err, "some: suffix 1")
+
+	err = errors.WrapRightf(err, "suffix %d", 2)
+	assert.ErrorIs(t, err, ErrSome)
+	assert.EqualError(t, err, "some: suffix 1: suffix 2")
+}
