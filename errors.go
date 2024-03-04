@@ -14,6 +14,10 @@ func (w *withStack) Unwrap() error {
 	return w.error
 }
 
+func (w *withStack) MarshalText() ([]byte, error) {
+	return []byte(w.error.Error()), nil
+}
+
 func New(msg string) error {
 	return &withStack{
 		error: errors.New(msg),
