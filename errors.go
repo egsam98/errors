@@ -5,18 +5,8 @@ import (
 	"fmt"
 )
 
-type withStack struct {
-	error
-	stack
-}
-
-func (w *withStack) Unwrap() error {
-	return w.error
-}
-
-func (w *withStack) MarshalText() ([]byte, error) {
-	return []byte(w.error.Error()), nil
-}
+func Is(err error, target error) bool { return errors.Is(err, target) }
+func As(err error, target any) bool   { return errors.As(err, target) }
 
 func New(msg string) error {
 	return &withStack{
@@ -25,6 +15,9 @@ func New(msg string) error {
 	}
 }
 
+// Errorf formats according to a format specifier and returns the string
+// as a value that satisfies error.
+// Errorf also records the stack trace at the point it was called.
 func Errorf(format string, args ...any) error {
 	return &withStack{
 		error: fmt.Errorf(format, args...),
@@ -32,7 +25,10 @@ func Errorf(format string, args ...any) error {
 	}
 }
 
-func Wrapf(err error, format string, args ...any) error {
+// Wrap returns an error annotating err with a stack trace
+// at the point Wrap is called, and the format specifier.
+// If err is nil, Wrap returns nil.
+func Wrap(err error, format string, args ...any) error {
 	if err == nil {
 		return nil
 	}
@@ -42,11 +38,8 @@ func Wrapf(err error, format string, args ...any) error {
 	}
 }
 
-func Wrap(err error, message string) error {
-	return Wrapf(err, message)
-}
-
-func WrapRight(err error, format string, args ...any) error {
+// WrapR behaves similarly to Wrap but appends format and args on the right side of formatted text
+func WrapR(err error, format string, args ...any) error {
 	if err == nil {
 		return nil
 	}
@@ -56,6 +49,8 @@ func WrapRight(err error, format string, args ...any) error {
 	}
 }
 
+// WithStack annotates err with a stack trace at the point WithStack was called.
+// If err is nil, WithStack returns nil.
 func WithStack(err error) error {
 	if err == nil {
 		return nil
@@ -74,4 +69,17 @@ func getOrNewStack(err error) stack {
 		return w.stack
 	}
 	return newStack()
+}
+
+type withStack struct {
+	error
+	stack
+}
+
+func (w *withStack) Unwrap() error {
+	return w.error
+}
+
+func (w *withStack) MarshalText() ([]byte, error) {
+	return []byte(w.error.Error()), nil
 }

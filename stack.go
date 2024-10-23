@@ -1,15 +1,14 @@
 package errors
 
 import (
+	"iter"
 	"runtime"
-	"strconv"
-	"strings"
 )
 
 const maxDepth = 20
 
 type StackTracer interface {
-	StackTrace() []string
+	StackTrace() iter.Seq[runtime.Frame]
 }
 
 type stack []uintptr
@@ -20,20 +19,15 @@ func newStack() stack {
 	return pcs[:n]
 }
 
-func (s stack) StackTrace() (trace []string) {
-	frames := runtime.CallersFrames(s)
-	for more := true; more; {
-		var f runtime.Frame
-		f, more = frames.Next()
-
-		var str strings.Builder
-		str.WriteString(f.File)
-		str.WriteString(": ")
-		str.WriteString(f.Function)
-		str.WriteByte(':')
-		str.WriteString(strconv.Itoa(f.Line))
-
-		trace = append(trace, str.String())
+func (s stack) StackTrace() iter.Seq[runtime.Frame] {
+	return func(yield func(runtime.Frame) bool) {
+		frames := runtime.CallersFrames(s)
+		for more := true; more; {
+			var f runtime.Frame
+			f, more = frames.Next()
+			if !yield(f) {
+				return
+			}
+		}
 	}
-	return
 }
